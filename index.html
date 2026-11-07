@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kzee Movie Recap AI</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+ background:#080d18;
+ color:#fff;
+ font-family:Inter,Padauk,sans-serif;
+ padding:18px;
+ min-height:100vh;
+}
+
+.container{max-width:520px;margin:auto}
+
+.header{
+ text-align:center;
+ padding:20px 10px 25px;
+}
+
+.logo{
+ width:65px;height:65px;
+ border-radius:20px;
+ background:linear-gradient(135deg,#00d4ff,#6755ff);
+ display:grid;place-items:center;
+ font-size:32px;margin:auto auto 12px;
+ box-shadow:0 0 30px #00bfff40;
+}
+
+.header h1{
+ font-size:23px;
+ font-weight:800;
+ background:linear-gradient(90deg,#39d9ff,#a58bff);
+ -webkit-background-clip:text;
+ color:transparent;
+}
+
+.header p{
+ color:#8c9bb5;
+ font-size:13px;
+ margin-top:7px;
+}
+
+.card{
+ background:#111b2d;
+ border:1px solid #263650;
+ border-radius:18px;
+ padding:18px;
+ margin-bottom:15px;
+}
+
+.section-title{
+ font-size:16px;
+ font-weight:700;
+ margin-bottom:15px;
+ display:flex;
+ align-items:center;
+ gap:9px;
+}
+
+.number{
+ background:#164e72;
+ color:#42d9ff;
+ width:28px;height:28px;
+ border-radius:9px;
+ display:grid;place-items:center;
+ font-size:13px;
+}
+
+.upload{
+ border:2px dashed #34516e;
+ border-radius:15px;
+ padding:27px 12px;
+ text-align:center;
+ background:#0b1423;
+ cursor:pointer;
+}
+
+.upload .icon{font-size:38px;margin-bottom:10px}
+.upload p{font-size:14px;font-weight:600}
+.upload small{color:#8393aa;display:block;margin-top:7px}
+
+input[type=file]{display:none}
+
+video{
+ width:100%;
+ border-radius:12px;
+ margin-top:15px;
+ background:#000;
+}
+
+.info{
+ color:#55d9ff;
+ font-size:12px;
+ margin-top:10px;
+}
+
+label{
+ display:block;
+ font-size:13px;
+ color:#c5d0e2;
+ margin:15px 0 9px;
+}
+
+select{
+ width:100%;
+ padding:14px;
+ background:#0b1423;
+ color:#fff;
+ border:1px solid #344660;
+ border-radius:11px;
+ font-size:14px;
+ outline:none;
+}
+
+.range-row{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ font-size:13px;
+ color:#c4d0e0;
+ margin-top:16px;
+}
+
+.value{
+ color:#45d5ff;
+ font-weight:700;
+}
+
+input[type=range]{
+ width:100%;
+ accent-color:#27c9ff;
+ margin-top:13px;
+}
+
+.test-btn{
+ width:100%;
+ padding:12px;
+ background:#1c3150;
+ color:#67dfff;
+ border:1px solid #345a80;
+ border-radius:10px;
+ margin-top:15px;
+ font-weight:700;
+}
+
+.start-btn{
+ width:100%;
+ padding:17px;
+ border:0;
+ border-radius:13px;
+ color:white;
+ font-size:17px;
+ font-weight:800;
+ background:linear-gradient(100deg,#087cff,#774cff);
+ box-shadow:0 6px 22px #276dff35;
+}
+
+.start-btn:active{transform:scale(.98)}
+
+.status{
+ margin-top:15px;
+ padding:14px;
+ background:#0b1423;
+ border-radius:12px;
+ font-size:13px;
+ color:#a8bad1;
+ line-height:1.8;
+}
+
+.step{
+ display:flex;
+ gap:10px;
+ padding:9px 0;
+ border-bottom:1px solid #263650;
+}
+
+.step:last-child{border:0}
+.step-icon{color:#4bd7ff}
+
+.output{
+ background:#0b1423;
+ border:1px dashed #34516e;
+ border-radius:13px;
+ padding:20px 12px;
+ text-align:center;
+ color:#8c9bb5;
+ font-size:13px;
+}
+
+.download{
+ display:none;
+ width:100%;
+ padding:14px;
+ margin-top:12px;
+ background:#13a66b;
+ color:white;
+ border:0;
+ border-radius:10px;
+ font-weight:700;
+}
+
+.footer{
+ text-align:center;
+ color:#61738d;
+ font-size:11px;
+ padding:20px 0;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+ <div class="logo">🎬</div>
+ <h1>KZEE MOVIE RECAP AI</h1>
+ <p>AI Movie Recap Studio · Myanmar Voice</p>
+</div>
+
+<!-- VIDEO UPLOAD -->
+
+<div class="card">
+ <div class="section-title">
+  <span class="number">1</span>
+  Video Upload
+ </div>
+
+ <label class="upload" for="videoFile">
+  <div class="icon">📁</div>
+  <p>Video ရွေးချယ်ပါ</p>
+  <small>MP4 / MOV / WEBM · အများဆုံး ၅ မိနစ်</small>
+ </label>
+
+ <input type="file" id="videoFile"
+ accept="video/mp4,video/webm,video/quicktime">
+
+ <video id="videoPreview" controls hidden></video>
+
+ <div class="info" id="videoInfo">
+  Video မရွေးရသေးပါ။
+ </div>
+</div>
+
+<!-- VOICE -->
+
+<div class="card">
+ <div class="section-title">
+  <span class="number">2</span>
+  အသံရွေးချယ်ပါ
+ </div>
+
+ <label>Recap Voice</label>
+ <select id="voice">
+  <option value="thiha">Thiha (Male)</option>
+  <option value="nilar">Nilar (Female)</option>
+ </select>
+
+ <button class="test-btn" onclick="testVoice()">
+  🔊 အသံစမ်းနားထောင်မည်
+ </button>
+</div>
+
+<!-- AUDIO SETTINGS -->
+
+<div class="card">
+ <div class="section-title">
+  <span class="number">3</span>
+  အသံချိန်ညှိခြင်း
+ </div>
+
+ <div class="range-row">
+  <span>အသံ Speed</span>
+  <span class="value" id="speedValue">1.0x</span>
+ </div>
+
+ <input type="range" id="speed"
+ min="0.7" max="1.3" step="0.1" value="1">
+
+ <div class="range-row">
+  <span>အသံ Pitch</span>
+  <span class="value" id="pitchValue">0</span>
+ </div>
+
+ <input type="range" id="pitch"
+ min="-5" max="5" step="1" value="0">
+
+ <small style="color:#8092aa;font-size:11px">
+  Speed နှင့် Pitch ကို ကိုယ်တိုင်ချိန်ညှိနိုင်ပါတယ်။
+ </small>
+</div>
+
+<!-- START -->
+
+<div class="card">
+ <div class="section-title">
+  <span class="number">4</span>
+  Movie Recap
+ </div>
+
+ <button class="start-btn" onclick="startRecap()">
+  🚀 စတင်မည်
+ </button>
+
+ <div class="status" id="status">
+  <b>System Status</b>
+  <div>🟢 UI Ready</div>
+  <div>🟡 Backend မချိတ်ဆက်ရသေးပါ။</div>
+ </div>
+</div>
+
+<!-- PROCESS -->
+
+<div class="card">
+ <div class="section-title">
+  <span class="number">5</span>
+  လုပ်ဆောင်ချက်အဆင့်များ
+ </div>
+
+ <div class="step">
+  <span class="step-icon">①</span>
+  <span>Video Upload & Analysis</span>
+ </div>
+
+ <div class="step">
+  <span class="step-icon">②</span>
+  <span>AssemblyAI Transcript</span>
+ </div>
+
+ <div class="step">
+  <span class="step-icon">③</span>
+  <span>Gemini Myanmar Translation</span>
+ </div>
+
+ <div class="step">
+  <span class="step-icon">④</span>
+  <span>Edge TTS Voice Generation</span>
+ </div>
+
+ <div class="step">
+  <span class="step-icon">⑤</span>
+  <span>Audio & Video Synchronization</span>
+ </div>
+
+ <div class="step">
+  <span class="step-icon">⑥</span>
+  <span>Final MP4 Rendering</span>
+ </div>
+</div>
+
+<!-- OUTPUT -->
+
+<div class="card">
+ <div class="section-title">
+  <span class="number">6</span>
+  Output Video
+ </div>
+
+ <div class="output" id="output">
+  🎥
+  <p style="margin-top:10px">
+   Recap Video ထွက်လာပါက ဒီနေရာမှာ ပြသပါမယ်။
+  </p>
+ </div>
+
+ <video id="resultVideo" controls hidden></video>
+
+ <button class="download" id="downloadBtn">
+  ⬇ MP4 Download
+ </button>
+</div>
+
+<div class="footer">
+ KZEE MOVIE RECAP AI<br>
+ Powered by AssemblyAI · Gemini · Edge TTS
+</div>
+
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){
+ tg.ready();
+ tg.expand();
+}
+
+const fileInput=document.getElementById('videoFile');
+const preview=document.getElementById('videoPreview');
+const info=document.getElementById('videoInfo');
+
+let selectedFile=null;
+let previewURL=null;
+
+fileInput.addEventListener('change',()=>{
+ const file=fileInput.files[0];
+ if(!file)return;
+
+ selectedFile=null;
+
+ const url=URL.createObjectURL(file);
+ const check=document.createElement('video');
+ check.preload='metadata';
+
+ check.onloadedmetadata=()=>{
+  if(check.duration>300){
+   URL.revokeObjectURL(url);
+   fileInput.value='';
+   preview.hidden=true;
+   info.textContent='❌ ၅ မိနစ်ထက်ကျော်နေပါတယ်။';
+   return;
+  }
+
+  if(check.duration<=0 || !Number.isFinite(check.duration)){
+   info.textContent='Video ကြာချိန်ကို ဖတ်မရပါ။';
+   URL.revokeObjectURL(url);
+   return;
+  }
+
+  selectedFile=file;
+
+  if(previewURL)URL.revokeObjectURL(previewURL);
+  previewURL=url;
+
+  preview.src=url;
+  preview.hidden=false;
+
+  info.textContent=
+   '✅ '+file.name+
+   ' · '+Math.floor(check.duration/60)+' မိနစ် '+
+   Math.floor(check.duration%60)+' စက္ကန့်';
+ };
+
+ check.onerror=()=>{
+  URL.revokeObjectURL(url);
+  info.textContent='❌ Video ဖိုင်ကို ဖတ်မရပါ။';
+ };
+
+ check.src=url;
+});
+
+const speed=document.getElementById('speed');
+const pitch=document.getElementById('pitch');
+
+speed.oninput=()=>{
+ document.getElementById('speedValue').textContent=
+ speed.value+'x';
+};
+
+pitch.oninput=()=>{
+ document.getElementById('pitchValue').textContent=
+ pitch.value;
+};
+
+function testVoice(){
+ if(!window.speechSynthesis){
+  alert('ဒီ Browser မှာ Voice Preview မရနိုင်ပါ။');
+  return;
+ }
+
+ speechSynthesis.cancel();
+
+ const msg=new SpeechSynthesisUtterance(
+  'မင်္ဂလာပါ။ ကျွန်တော် Movie Recap AI ဖြစ်ပါတယ်။'
+ );
+
+ msg.lang='my-MM';
+ msg.rate=Number(speed.value);
+ msg.pitch=Math.max(.5,Math.min(2,1+Number(pitch.value)*.1));
+
+ speechSynthesis.speak(msg);
+}
+
+function startRecap(){
+ if(!selectedFile){
+  alert('အရင်ဆုံး Video Upload လုပ်ပေးပါ။');
+  return;
+ }
+
+ document.getElementById('status').innerHTML=
+ '<b>Backend Connection</b><br>'+
+ '🟡 Video Ready<br>'+
+ '🟡 AssemblyAI / Gemini / Edge TTS Backend မချိတ်ဆက်ရသေးပါ။<br>'+
+ 'Backend ချိတ်ဆက်ပြီးမှ Recap စတင်နိုင်ပါမယ်။';
+
+ alert('Video ရွေးချယ်မှု အောင်မြင်ပါပြီ။ Backend ချိတ်ဆက်ရန် လိုအပ်ပါသေးတယ်။');
+}
+
+document.getElementById('downloadBtn').onclick=()=>{
+ const link=document.createElement('a');
+ link.href=document.getElementById('resultVideo').src;
+ link.download='Kzee-Movie-Recap.mp4';
+ link.click();
+};
+</script>
+</body>
+</html>
